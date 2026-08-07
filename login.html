@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresa · Dinero Ya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0E1B2C;
+      color: #FAF7F1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .box {
+      background: #14253c;
+      border: 1px solid rgba(176, 141, 87, 0.3);
+      border-radius: 2px;
+      padding: 50px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px -20px rgba(0,0,0,.55);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #FAF7F1;
+    }
+    .logo-s {
+      display: block;
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #D9BE8E;
+      margin-top: 4px;
+    }
+    .form-group { margin-bottom: 20px; }
+    label {
+      display: block;
+      font-size: 0.7rem;
+      color: #D9BE8E;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      background: #0E1B2C;
+      border: 1px solid rgba(176, 141, 87, 0.3);
+      color: #FAF7F1;
+      border-radius: 2px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    input:focus {
+      border-color: #B08D57;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #8C6C3F;
+      color: #FAF7F1;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 2px;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: background 0.2s;
+    }
+    button:hover { background: #B08D57; }
+    button:disabled { background: #55606f; cursor: not-allowed; }
+    .msg {
+      padding: 12px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 0.85rem;
+    }
+    .error {
+      background: rgba(244, 67, 54, 0.15);
+      color: #f28b82;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+    .success {
+      background: rgba(76, 175, 80, 0.15);
+      color: #81c995;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+    .link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.85rem;
+    }
+    .link a {
+      color: #D9BE8E;
+      text-decoration: none;
+    }
+    .link a:hover { color: #B08D57; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <div class="logo">
+    <div class="logo-n">Dinero Ya</div>
+    <span class="logo-s">Joyería · Panamá</span>
+  </div>
+
+  <div class="msg error" id="err"></div>
+  <div class="msg success" id="ok"></div>
+
+  <form onsubmit="login(event)">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" required placeholder="tu@email.com">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="pass" required placeholder="••••••••">
+    </div>
+    <button type="submit" id="btn">Ingresar</button>
+  </form>
+
+  <div class="link">
+    <a href="/">← Volver al sitio</a>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWpjPPlgMlZ9O8NvgZ-klw4hCcLYpqMR4",
+    authDomain: "dineroya-706f2.firebaseapp.com",
+    projectId: "dineroya-706f2",
+    storageBucket: "dineroya-706f2.firebasestorage.app",
+    messagingSenderId: "183298279705",
+    appId: "1:183298279705:web:3205d60dcc40087f62dd88"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      window.location.href = '/app';
+    }
+  });
+
+  async function login(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('pass').value;
+    const btn = document.getElementById('btn');
+    const err = document.getElementById('err');
+    const ok = document.getElementById('ok');
+
+    err.style.display = 'none';
+    ok.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    try {
+      const result = await auth.signInWithEmailAndPassword(email, pass);
+
+      if (result.user) {
+        ok.textContent = 'Ingreso exitoso. Redirigiendo al dashboard...';
+        ok.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1200);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+
+      let message = 'Error al iniciar sesión';
+      if (error.code === 'auth/user-not-found') {
+        message = 'Usuario no encontrado';
+      } else if (error.code === 'auth/wrong-password') {
+        message = 'Contraseña incorrecta';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Email inválido';
+      }
+
+      err.textContent = message;
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+    }
+  }
+</script>
+
+</body>
+</html>

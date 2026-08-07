@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Dinero Ya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --gold: #B08D57;
+      --gold-l: #D9BE8E;
+      --bg: #0E1B2C;
+      --bg2: #14253c;
+      --bgc: #101f33;
+      --t1: #FAF7F1;
+      --t2: #9aa7ba;
+      --b: rgba(176, 141, 87, 0.2);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--bg2);
+      border-right: 1px solid var(--b);
+      padding: 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: block;
+      margin-bottom: 30px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .sidebar-logo-n { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+    .sidebar-logo-s { display: block; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-l); margin-top: 3px; }
+
+    .sidebar-menu { list-style: none; }
+    .sidebar-menu li { margin-bottom: 6px; }
+    .sidebar-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; color: var(--t2);
+      text-decoration: none; border-radius: 2px;
+      transition: all 0.2s; font-size: 0.88rem;
+    }
+    .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(176, 141, 87, 0.1); color: var(--gold-l); }
+    .sidebar-menu i { width: 20px; text-align: center; }
+
+    .sidebar-user {
+      position: absolute; bottom: 20px; left: 20px; right: 20px;
+      padding-top: 20px; border-top: 1px solid var(--b);
+    }
+    .user-name { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; }
+    .user-email { font-size: 0.72rem; color: var(--t2); }
+    .btn-logout {
+      width: 100%; padding: 10px; margin-top: 12px;
+      background: transparent; border: 1px solid var(--b); color: var(--t2);
+      cursor: pointer; border-radius: 2px; font-size: 0.82rem; transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--gold); color: var(--gold-l); }
+
+    .main { margin-left: 260px; padding: 30px; }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 36px; padding-bottom: 20px; border-bottom: 1px solid var(--b);
+    }
+    h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 500; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 36px; }
+    .stat-card { background: var(--bgc); border: 1px solid var(--b); padding: 22px; border-radius: 2px; }
+    .stat-label { font-size: 0.75rem; color: var(--t2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .stat-value { font-size: 1.9rem; font-weight: 600; color: var(--gold-l); }
+
+    .content-section { background: var(--bgc); border: 1px solid var(--b); border-radius: 2px; padding: 28px; margin-bottom: 30px; }
+    .section-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+    .table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .table th { background: var(--bg); padding: 12px; text-align: left; font-weight: 600; color: var(--gold-l); border-bottom: 1px solid var(--b); }
+    .table td { padding: 12px; border-bottom: 1px solid var(--b); color: var(--t2); }
+    .table tr:hover td { background: rgba(176, 141, 87, 0.05); }
+
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 2px; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; }
+    .badge-pending { background: rgba(255, 193, 7, 0.15); color: #ffc94d; }
+    .badge-active { background: rgba(76, 175, 80, 0.15); color: #81c995; }
+
+    .btn { background: var(--gold); color: #0E1B2C; border: none; padding: 8px 14px; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: background 0.2s; }
+    .btn:hover { background: var(--gold-l); }
+
+    .loading { text-align: center; padding: 40px; color: var(--t2); }
+
+    @media (max-width: 1040px) {
+      .app-container { grid-template-columns: 1fr; }
+      .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--b); }
+      .main { margin-left: 0; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="sidebar">
+    <a href="/" class="sidebar-logo">
+      <div class="sidebar-logo-n">Dinero Ya</div>
+      <span class="sidebar-logo-s">Joyería · Panamá</span>
+    </a>
+
+    <ul class="sidebar-menu">
+      <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="#" onclick="showSection('citas')"><i class="fas fa-calendar-check"></i> Citas</a></li>
+    </ul>
+
+    <div class="sidebar-user">
+      <div class="user-info">
+        <div class="user-name" id="userNameDisplay">Cargando...</div>
+        <div class="user-email" id="userEmailDisplay"></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="dashboard-section">
+      <div class="header"><h1>Dashboard</h1></div>
+
+      <div class="stats">
+        <div class="stat-card"><div class="stat-label">Citas totales</div><div class="stat-value" id="stat-citas">0</div></div>
+        <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-value" id="stat-pendientes">0</div></div>
+        <div class="stat-card"><div class="stat-label">Atendidas</div><div class="stat-value" id="stat-atendidas">0</div></div>
+      </div>
+
+      <div class="content-section">
+        <div class="section-title"><i class="fas fa-calendar-check"></i> Últimas Citas</div>
+        <table class="table">
+          <thead><tr><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Estado</th></tr></thead>
+          <tbody id="citas-mini-table"><tr><td colspan="4" class="loading">Cargando datos...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="citas-section" style="display: none;">
+      <div class="header"><h1>Citas</h1></div>
+      <div class="content-section">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Servicio</th>
+              <th>Fecha / Hora</th>
+              <th>Contacto</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="citas-full-table"><tr><td colspan="7" class="loading">Cargando datos...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWpjPPlgMlZ9O8NvgZ-klw4hCcLYpqMR4",
+    authDomain: "dineroya-706f2.firebaseapp.com",
+    projectId: "dineroya-706f2",
+    storageBucket: "dineroya-706f2.firebasestorage.app",
+    messagingSenderId: "183298279705",
+    appId: "1:183298279705:web:3205d60dcc40087f62dd88"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUser = null;
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      window.location.href = '/login';
+      return;
+    }
+    currentUser = user;
+    document.getElementById('userNameDisplay').textContent = user.email;
+    document.getElementById('userEmailDisplay').textContent = user.email;
+    loadDashboardData();
+  });
+
+  function esc(s) { return (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  async function loadDashboardData() {
+    try {
+      const snap = await db.collection('citas').orderBy('creadoEn', 'desc').get();
+      document.getElementById('stat-citas').textContent = snap.size;
+
+      let pendientes = 0, atendidas = 0;
+      let mini = '', full = '';
+      let i = 0;
+      snap.forEach(doc => {
+        const d = doc.data();
+        const isPend = d.estado !== 'atendido';
+        if (isPend) pendientes++; else atendidas++;
+        const badge = isPend
+          ? '<span class="badge badge-pending">Pendiente</span>'
+          : '<span class="badge badge-active">Atendido</span>';
+        if (i < 6) {
+          mini += `<tr><td>${esc(d.nombre)}</td><td>${esc(d.servicio)}</td><td>${esc(d.fecha)}</td><td>${badge}</td></tr>`;
+        }
+        const accion = isPend
+          ? `<button class="btn" onclick="marcarAtendido('${doc.id}')">Marcar atendida</button>`
+          : '—';
+        full += `<tr>
+          <td>${esc(d.nombre)}</td>
+          <td>${esc(d.servicio)}</td>
+          <td>${esc(d.fecha)} ${esc(d.hora)}</td>
+          <td>${esc(d.whatsapp)}<br>${esc(d.email)}</td>
+          <td>${esc(d.descripcion)}</td>
+          <td>${badge}</td>
+          <td>${accion}</td>
+        </tr>`;
+        i++;
+      });
+      document.getElementById('stat-pendientes').textContent = pendientes;
+      document.getElementById('stat-atendidas').textContent = atendidas;
+      document.getElementById('citas-mini-table').innerHTML = mini || '<tr><td colspan="4" class="loading">Sin citas aún</td></tr>';
+      document.getElementById('citas-full-table').innerHTML = full || '<tr><td colspan="7" class="loading">Sin citas aún</td></tr>';
+    } catch (e) {
+      console.error('Error loading dashboard data:', e);
+    }
+  }
+
+  async function marcarAtendido(id) {
+    try {
+      await db.collection('citas').doc(id).update({ estado: 'atendido' });
+      loadDashboardData();
+    } catch (e) {
+      console.error('Error updating cita:', e);
+      alert('No se pudo actualizar la cita.');
+    }
+  }
+
+  function showSection(section) {
+    document.querySelectorAll('[id$="-section"]').forEach(el => el.style.display = 'none');
+    document.getElementById(section + '-section').style.display = 'block';
+    document.querySelectorAll('.sidebar-menu a').forEach(el => el.classList.remove('active'));
+    event.target.closest('a').classList.add('active');
+  }
+
+  function logout() {
+    auth.signOut().then(() => { window.location.href = '/'; });
+  }
+</script>
+
+</body>
+</html>
