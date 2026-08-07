@@ -25,8 +25,6 @@
     }
 
     .app-container {
-      display: grid;
-      grid-template-columns: 260px 1fr;
       min-height: 100vh;
     }
 
@@ -105,10 +103,14 @@
     .loading { text-align: center; padding: 40px; color: var(--t2); }
 
     @media (max-width: 1040px) {
-      .app-container { grid-template-columns: 1fr; }
       .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--b); }
-      .main { margin-left: 0; }
+      .main { margin-left: 0; padding: 20px; }
       .stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: 1fr; }
+      .table { display: block; overflow-x: auto; white-space: nowrap; }
+      .header { flex-wrap: wrap; gap: 12px; }
     }
   </style>
 </head>
