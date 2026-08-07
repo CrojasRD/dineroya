@@ -59,29 +59,42 @@ a{text-decoration:none;color:inherit}
 .mm a{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(14,27,44,.65)}
 .mm-x{position:absolute;top:24px;right:24px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--navy)}
 
-/* HERO */
-#hero{position:relative;min-height:100vh;background:var(--navy);display:flex;align-items:center;overflow:hidden;padding-top:80px}
-.h-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1600&auto=format&fit=crop');background-size:cover;background-position:center;opacity:.22}
-.h-ov{position:absolute;inset:0;background:linear-gradient(135deg,rgba(14,27,44,.96),rgba(14,27,44,.55))}
-.h-in{position:relative;z-index:2;display:grid;gap:48px;align-items:center;padding:80px 0}
-@media(min-width:768px){.h-in{grid-template-columns:1fr 1fr;gap:64px}}
-.h-tag{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-l);font-weight:500}
-.h-title{font-family:'Playfair Display',serif;font-size:clamp(34px,5vw,62px);font-weight:500;color:var(--cream);line-height:1.15;margin-top:18px}
-.h-title span{color:var(--gold-l)}
-.h-desc{color:rgba(250,247,241,.65);font-size:16px;line-height:1.75;margin-top:14px;max-width:440px}
-.h-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.h-pill{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(250,247,241,.35)}
-.h-pill+.h-pill::before{content:'|';margin-right:6px;color:rgba(217,190,142,.25)}
-.h-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.h-img{position:relative}
-.h-img img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r);border:1px solid rgba(217,190,142,.15)}
-.h-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(14,27,44,.35),transparent 50%);border-radius:var(--r)}
-.h-stats{display:flex;gap:28px;margin-top:28px;padding-top:24px;border-top:1px solid rgba(250,247,241,.1)}
-.h-sn{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold-l);display:block}
-.h-sl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,241,.35)}
-.h-badge{position:absolute;bottom:20px;left:20px;z-index:1;background:rgba(14,27,44,.85);backdrop-filter:blur(8px);border:1px solid rgba(217,190,142,.25);border-radius:var(--r);padding:10px 14px}
-.h-badge p{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-l);margin-bottom:2px}
-.h-badge span{font-size:10px;color:rgba(250,247,241,.45)}
+/* HERO SLIDER */
+#hero{position:relative;height:100vh;min-height:640px;overflow:hidden;background:var(--navy)}
+.hs-slides{position:relative;width:100%;height:100%}
+.hs-slide{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;opacity:0;transition:opacity .9s ease;pointer-events:none}
+.hs-slide.on{opacity:1;pointer-events:auto}
+.hs-l{display:flex;flex-direction:column;justify-content:center;padding:100px 6% 60px 8%;background:var(--navy);position:relative;z-index:2}
+@media(min-width:768px){.hs-l{padding:100px 5% 60px 8%}}
+.hs-r{position:relative;overflow:hidden}
+.hs-img{width:100%;height:100%;object-fit:cover;filter:brightness(.82) saturate(1.05)}
+.hs-scrim{position:absolute;inset:0;background:linear-gradient(90deg,var(--navy) 0%,rgba(14,27,44,.15) 40%,transparent 100%)}
+.hs-tag{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-l);font-weight:500}
+.hs-title{font-family:'Playfair Display',serif;font-size:clamp(30px,4.2vw,54px);font-weight:500;color:var(--cream);line-height:1.15;margin-top:16px}
+.hs-title span{color:var(--gold-l)}
+.hs-desc{color:rgba(250,247,241,.6);font-size:15px;line-height:1.75;margin-top:14px;max-width:420px}
+.hs-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hs-stats{display:flex;gap:24px;margin-top:26px;padding-top:20px;border-top:1px solid rgba(250,247,241,.1);flex-wrap:wrap}
+.hs-sn{font-family:'Playfair Display',serif;font-size:24px;color:var(--gold-l);display:block}
+.hs-sl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,241,.35)}
+.hs-dots{position:absolute;bottom:26px;left:8%;display:flex;gap:8px;z-index:10;align-items:center}
+.hs-dot{width:22px;height:2px;background:rgba(250,247,241,.3);cursor:pointer;transition:all .3s;border:none}
+.hs-dot.on{width:44px;background:var(--gold-l)}
+.hs-arrs{position:absolute;bottom:20px;right:6%;display:flex;gap:6px;z-index:10}
+.hs-arr{width:40px;height:40px;border:1px solid rgba(217,190,142,.35);background:rgba(14,27,44,.4);backdrop-filter:blur(6px);color:rgba(250,247,241,.75);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .25s}
+.hs-arr:hover{border-color:var(--gold-l);color:var(--gold-l)}
+@media(max-width:1040px){
+  .hs-slide{grid-template-columns:1fr}
+  .hs-r{position:absolute;inset:0;z-index:1}
+  .hs-l{position:relative;z-index:2;background:transparent;padding:110px 6% 64px}
+  .hs-scrim{background:linear-gradient(180deg,rgba(14,27,44,.3) 0%,rgba(14,27,44,.62) 55%,rgba(14,27,44,.94) 100%)}
+  .hs-img{filter:brightness(.7) saturate(1.05)}
+  .hs-desc{color:rgba(250,247,241,.75)}
+}
+@media(max-width:480px){
+  .hs-l{padding-top:96px}
+  .hs-stats{gap:18px}
+}
 
 /* QS BAR */
 .qs{background:var(--ivory);border-bottom:1px solid rgba(14,27,44,.07)}
@@ -234,35 +247,79 @@ footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rg
 
 <!-- HERO -->
 <section id="hero">
-  <div class="h-bg"></div>
-  <div class="h-ov"></div>
-  <div class="wrap h-in">
-    <div class="au">
-      <p class="h-tag">Casa de Empeño · Joyería · Panamá</p>
-      <h1 class="h-title">Compramos y<br>Vendemos <span>Joyas de Valor</span></h1>
-      <p class="h-desc">Valuación profesional, empeño seguro y la mejor selección de joyas y relojes de lujo en la Plaza 5 de Mayo, Panamá.</p>
-      <div class="h-pills">
-        <span class="h-pill">Tasación certificada</span>
-        <span class="h-pill">Valuación transparente</span>
-        <span class="h-pill">Empeño confidencial</span>
+  <div class="hs-slides" id="hsSlides">
+
+    <!-- SLIDE 1 — Compra y venta -->
+    <div class="hs-slide on" id="hs0">
+      <div class="hs-l">
+        <p class="hs-tag">Casa de Empeño · Joyería · Panamá</p>
+        <h1 class="hs-title">Compramos y<br>Vendemos <span>Joyas de Valor</span></h1>
+        <p class="hs-desc">Valuación profesional y la mejor selección de joyas en oro y plata en la Plaza 5 de Mayo, Panamá.</p>
+        <div class="hs-btns">
+          <a href="#reservar" class="btn btn-g">Separar cita</a>
+          <a href="#servicios" class="btn btn-ow">Ver servicios</a>
+        </div>
+        <div class="hs-stats">
+          <div><span class="hs-sn">500+</span><span class="hs-sl">Clientes satisfechos</span></div>
+          <div><span class="hs-sn">15+</span><span class="hs-sl">Años de experiencia</span></div>
+          <div><span class="hs-sn">1,200+</span><span class="hs-sl">Joyas vendidas</span></div>
+        </div>
       </div>
-      <div class="h-btns">
-        <a href="#reservar" class="btn btn-g">Separar cita</a>
-        <a href="#servicios" class="btn btn-ow">Ver servicios</a>
-      </div>
-      <div class="h-stats">
-        <div><span class="h-sn">500+</span><span class="h-sl">Clientes satisfechos</span></div>
-        <div><span class="h-sn">15+</span><span class="h-sl">Años de experiencia</span></div>
-        <div><span class="h-sn">1,200+</span><span class="h-sl">Joyas vendidas</span></div>
-      </div>
-    </div>
-    <div class="h-img ai">
-      <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop" alt="Joyería Dinero Ya Panamá">
-      <div class="h-badge">
-        <p>Lun – Sáb: 9am – 7pm</p>
-        <span>Plaza 5 de Mayo, Santa Ana</span>
+      <div class="hs-r">
+        <img class="hs-img" src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=1200&auto=format&fit=crop" alt="Joyas de oro Dinero Ya Panamá">
+        <div class="hs-scrim"></div>
       </div>
     </div>
+
+    <!-- SLIDE 2 — Empeño -->
+    <div class="hs-slide" id="hs1">
+      <div class="hs-l">
+        <p class="hs-tag">Casa de Empeño</p>
+        <h1 class="hs-title">Dinero Inmediato<br>por tus <span>Joyas y Relojes</span></h1>
+        <p class="hs-desc">Empeña tus artículos de valor de forma rápida y segura. Bóveda blindada, plazos flexibles y proceso 100% transparente.</p>
+        <div class="hs-btns">
+          <a href="#empeno" class="btn btn-g">Ver tasas de empeño</a>
+          <a href="https://wa.me/50763365568?text=Hola%2C+quiero+empe%C3%B1ar+un+art%C3%ADculo" class="btn btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> Consultar</a>
+        </div>
+        <div class="hs-stats">
+          <div><span class="hs-sn">15 min</span><span class="hs-sl">Proceso completo</span></div>
+          <div><span class="hs-sn">Mismo día</span><span class="hs-sl">Cobras de inmediato</span></div>
+          <div><span class="hs-sn">Desde 4%</span><span class="hs-sl">Tasa mensual</span></div>
+        </div>
+      </div>
+      <div class="hs-r">
+        <img class="hs-img" src="https://images.unsplash.com/photo-1610375461369-d613b564f4c4?q=80&w=1200&auto=format&fit=crop" alt="Casa de empeño Dinero Ya">
+        <div class="hs-scrim"></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — Relojes de lujo -->
+    <div class="hs-slide" id="hs2">
+      <div class="hs-l">
+        <p class="hs-tag">Especialistas en Relojes</p>
+        <h1 class="hs-title">Tasación Experta de<br>Relojes <span>Gama Media y Alta</span></h1>
+        <p class="hs-desc">Desde marcas accesibles hasta piezas de alta gama como Rolex, Omega y Cartier, valoradas con precios actualizados del mercado internacional.</p>
+        <div class="hs-btns">
+          <a href="#relojes" class="btn btn-g">Ver marcas</a>
+          <a href="#reservar" class="btn btn-ow">Agendar cita</a>
+        </div>
+        <div class="hs-stats">
+          <div><span class="hs-sn">Expertos</span><span class="hs-sl">Certificados</span></div>
+          <div><span class="hs-sn">Toda gama</span><span class="hs-sl">Media y alta</span></div>
+          <div><span class="hs-sn">Gratis</span><span class="hs-sl">Tasación sin costo</span></div>
+        </div>
+      </div>
+      <div class="hs-r">
+        <img class="hs-img" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop" alt="Relojes de lujo Dinero Ya">
+        <div class="hs-scrim"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="hs-dots" id="hsDots"></div>
+  <div class="hs-arrs">
+    <button class="hs-arr" id="hsPrev" aria-label="Anterior">&#8249;</button>
+    <button class="hs-arr" id="hsNext" aria-label="Siguiente">&#8250;</button>
   </div>
 </section>
 
@@ -399,13 +456,9 @@ footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rg
       <p class="sec-sub">Agenda tu visita y te atendemos de manera personalizada.</p>
     </div>
     <div class="fw">
-      <!-- FormSubmit: reemplaza YOUR_EMAIL con carlitosecua2014@gmail.com -->
-      <form id="citaForm" action="https://formsubmit.co/carlitosecua2014@gmail.com" method="POST" novalidate>
-        <input type="hidden" name="_subject" value="Nueva cita — Dinero Ya Joyería">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_next" value="https://dineroya-lilac.vercel.app/#gracias">
+      <form id="citaForm" onsubmit="submitCita(event)" novalidate>
         <div class="fg">
+          <div class="fgg fl" id="citaErr" style="display:none;padding:12px 16px;border-radius:2px;font-size:13px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b">No se pudo enviar la solicitud. Por favor intenta de nuevo o escríbenos por WhatsApp.</div>
           <div class="fgg"><label>Nombre completo *</label><input type="text" name="Nombre" placeholder="Tu nombre completo" required></div>
           <div class="fgg"><label>WhatsApp *</label><input type="tel" name="WhatsApp" placeholder="+507 6000-0000" required></div>
           <div class="fgg"><label>Correo electrónico</label><input type="email" name="Email" placeholder="correo@email.com"></div>
@@ -511,14 +564,27 @@ footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rg
     </div>
     <div class="ftbot">
       <p>&copy; 2025 Dinero Ya Joyería. Todos los derechos reservados · Panamá</p>
-      <div style="display:flex;gap:14px"><a href="#">Privacidad</a></div>
+      <div style="display:flex;gap:14px"><a href="#">Privacidad</a><a href="login.html">Acceso administrativo</a></div>
     </div>
   </div>
 </footer>
 
 <a href="https://wa.me/50763365568?text=Hola%2C+me+gustar%C3%ADa+obtener+informaci%C3%B3n." class="wafab" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDWpjPPlgMlZ9O8NvgZ-klw4hCcLYpqMR4",
+  authDomain: "dineroya-706f2.firebaseapp.com",
+  projectId: "dineroya-706f2",
+  storageBucket: "dineroya-706f2.firebasestorage.app",
+  messagingSenderId: "183298279705",
+  appId: "1:183298279705:web:3205d60dcc40087f62dd88"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // Navbar scroll
 window.addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('sc',window.scrollY>30)});
 
@@ -526,11 +592,78 @@ window.addEventListener('scroll',function(){document.getElementById('nav').class
 function oM(){document.getElementById('mm').classList.add('on')}
 function cM(){document.getElementById('mm').classList.remove('on')}
 
-// Mostrar gracias si regresa con #gracias
-if(window.location.hash==='#gracias'){
-  document.getElementById('graciasMsg').style.display='block';
-  document.getElementById('citaForm').style.display='none';
-  setTimeout(function(){window.location.hash='';},5000);
+// Hero slider
+(function(){
+  const slides = document.querySelectorAll('.hs-slide');
+  const dotsWrap = document.getElementById('hsDots');
+  let cur = 0, timer;
+
+  slides.forEach((s, i) => {
+    const d = document.createElement('button');
+    d.className = 'hs-dot' + (i === 0 ? ' on' : '');
+    d.setAttribute('aria-label', 'Ir a banner ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = document.querySelectorAll('.hs-dot');
+
+  function go(n){
+    cur = (n + slides.length) % slides.length;
+    slides.forEach((s, i) => s.classList.toggle('on', i === cur));
+    dots.forEach((d, i) => d.classList.toggle('on', i === cur));
+    resetTimer();
+  }
+  function resetTimer(){
+    clearInterval(timer);
+    timer = setInterval(() => go(cur + 1), 6500);
+  }
+
+  document.getElementById('hsNext').addEventListener('click', () => go(cur + 1));
+  document.getElementById('hsPrev').addEventListener('click', () => go(cur - 1));
+  resetTimer();
+})();
+
+// Envío de cita a Firestore
+function submitCita(e){
+  e.preventDefault();
+  const form = document.getElementById('citaForm');
+  const errBox = document.getElementById('citaErr');
+  errBox.style.display = 'none';
+
+  const fd = new FormData(form);
+  const nombre = (fd.get('Nombre')||'').trim();
+  const whatsapp = (fd.get('WhatsApp')||'').trim();
+  const servicio = fd.get('Servicio')||'';
+  if(!nombre || !whatsapp || !servicio){
+    errBox.textContent = 'Por favor completa los campos obligatorios (*).';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const btn = form.querySelector('.fsubmit button');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  db.collection('citas').add({
+    nombre: nombre,
+    whatsapp: whatsapp,
+    email: (fd.get('Email')||'').trim(),
+    servicio: servicio,
+    fecha: fd.get('Fecha')||'',
+    hora: fd.get('Hora')||'',
+    descripcion: (fd.get('Descripcion')||'').trim(),
+    estado: 'nuevo',
+    creadoEn: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    document.getElementById('graciasMsg').style.display='block';
+    form.style.display='none';
+  }).catch(function(err){
+    console.error('Error al guardar la cita:', err);
+    errBox.textContent = 'No se pudo enviar la solicitud. Por favor intenta de nuevo o escríbenos por WhatsApp.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar cita';
+  });
 }
 </script>
 </body>
