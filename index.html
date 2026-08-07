@@ -38,10 +38,7 @@ a{text-decoration:none;color:inherit}
 #nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 0;transition:all .3s}
 #nav.sc{background:rgba(250,247,241,.97);backdrop-filter:blur(12px);box-shadow:0 2px 20px rgba(14,27,44,.07);padding:12px 0}
 .nav-i{display:flex;align-items:center;justify-content:space-between}
-.nav-logo-n{font-family:'Playfair Display',serif;font-size:21px;color:var(--cream);transition:color .3s}
-.nav-logo-s{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-l);display:block;transition:color .3s}
-#nav.sc .nav-logo-n{color:var(--navy)}
-#nav.sc .nav-logo-s{color:var(--gold-d)}
+.nav-logo-img{height:38px;width:auto;display:block}
 .nav-links{display:none;gap:36px;list-style:none}
 @media(min-width:768px){.nav-links{display:flex}}
 .nav-links a{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(250,247,241,.65);transition:color .25s}
@@ -188,8 +185,7 @@ a{text-decoration:none;color:inherit}
 footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rgba(250,247,241,.05)}
 .ftg{display:grid;gap:36px;padding:60px 0 36px}
 @media(min-width:768px){.ftg{grid-template-columns:1.5fr 1fr 1fr 1fr}}
-.ftn{font-family:'Playfair Display',serif;font-size:22px;color:var(--cream)}
-.fts{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-l);display:block;margin-bottom:14px}
+.ftn-img{height:44px;width:auto;display:block;margin-bottom:14px}
 .ftd{font-size:13px;line-height:1.7;color:rgba(250,247,241,.4);max-width:240px;margin-bottom:18px}
 .ftsoc{display:flex;gap:10px}
 .ftsc{width:32px;height:32px;border-radius:50%;border:1px solid rgba(250,247,241,.14);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(250,247,241,.4);transition:all .2s}
@@ -231,8 +227,7 @@ footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rg
 <nav id="nav">
   <div class="wrap nav-i">
     <a href="#hero">
-      <div class="nav-logo-n">Dinero Ya</div>
-      <span class="nav-logo-s">Joyería · Panamá</span>
+      <img src="img/logo.png" alt="Dinero Ya · Casa de Empeño" class="nav-logo-img">
     </a>
     <ul class="nav-links">
       <li><a href="#servicios">Servicios</a></li>
@@ -535,8 +530,7 @@ footer{background:var(--navy);color:rgba(250,247,241,.5);border-top:1px solid rg
   <div class="wrap">
     <div class="ftg">
       <div>
-        <p class="ftn">Dinero Ya</p>
-        <span class="fts">Joyería · Panamá</span>
+        <img src="img/logo.png" alt="Dinero Ya · Casa de Empeño" class="ftn-img">
         <p class="ftd">Tu casa de empeño y joyería de confianza en Panamá. Compra, venta y empeño con los mejores precios.</p>
         <div class="ftsoc">
           <a href="https://instagram.com/dineroya.pty" target="_blank" class="ftsc"><i class="fab fa-instagram"></i></a>
