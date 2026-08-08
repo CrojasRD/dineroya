@@ -615,6 +615,7 @@
       loadTasacionesChart();
     } catch (e) {
       console.error('Error guardando tasación:', e);
+      alert('⚠️ No se pudo guardar el registro (revisa tu conexión). El comprobante se va a imprimir, pero NO quedó guardado en el sistema — vuelve a intentarlo después.');
     }
 
     imprimirComprobante({
