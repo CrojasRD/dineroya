@@ -103,6 +103,26 @@
 
     .loading { text-align: center; padding: 40px; color: var(--t2); }
 
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    .fg.span2 { grid-column: 1 / -1; }
+    .fg label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-l); }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--b);
+      color: var(--t1); border-radius: 2px; font-family: inherit; font-size: 0.9rem;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { outline: none; border-color: var(--gold); }
+    .fg textarea { resize: vertical; min-height: 70px; }
+    .result-box {
+      background: var(--bg); border: 1px solid var(--gold); border-radius: 2px;
+      padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .result-label { font-size: 0.78rem; color: var(--t2); text-transform: uppercase; letter-spacing: 0.06em; }
+    .result-value { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold-l); }
+    .client-badge { font-size: 0.78rem; color: var(--t2); margin-bottom: 4px; }
+    .client-badge strong { color: var(--t1); }
+
     @media (max-width: 1040px) {
       .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--b); }
       .main { margin-left: 0; padding: 20px; }
@@ -126,6 +146,11 @@
     <ul class="sidebar-menu">
       <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
       <li><a href="#" onclick="showSection('citas')"><i class="fas fa-calendar-check"></i> Citas</a></li>
+      <li><a href="#" onclick="showSection('clientes')"><i class="fas fa-users"></i> Clientes</a></li>
+      <li><a href="#" onclick="showSection('tasador-joyas')"><i class="fas fa-gem"></i> Tasador de Joyas</a></li>
+      <li><a href="#" onclick="showSection('tasador-relojes')"><i class="fas fa-clock"></i> Tasador de Relojes</a></li>
+      <li><a href="#" onclick="showSection('cotizador-refaccion')"><i class="fas fa-tools"></i> Cotizador de Refacción</a></li>
+      <li><a href="#" onclick="showSection('cotizador-fabricacion')"><i class="fas fa-hammer"></i> Cotizador de Fabricación</a></li>
     </ul>
 
     <div class="sidebar-user">
@@ -173,6 +198,123 @@
           </thead>
           <tbody id="citas-full-table"><tr><td colspan="7" class="loading">Cargando datos...</td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="clientes-section" style="display: none;">
+      <div class="header"><h1>Clientes</h1></div>
+      <div class="content-section">
+        <table class="table">
+          <thead><tr><th>Nombre</th><th>Teléfono</th><th>Visitas</th><th>Última visita</th></tr></thead>
+          <tbody id="clientes-table"><tr><td colspan="4" class="loading">Cargando datos...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TASADOR DE JOYAS -->
+    <div id="tasador-joyas-section" style="display: none;">
+      <div class="header"><h1>Tasador de Joyas</h1></div>
+      <div class="content-section">
+        <div class="form-grid">
+          <div class="fg"><label>Nombre del cliente *</label><input type="text" id="tj-nombre"></div>
+          <div class="fg"><label>Teléfono / WhatsApp *</label><input type="tel" id="tj-telefono"></div>
+        </div>
+        <div class="form-grid full">
+          <div class="fg"><label>Descripción de la pieza</label><input type="text" id="tj-desc" placeholder="Ej. Anillo de oro con piedra"></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg"><label>Peso (gramos) *</label><input type="number" id="tj-peso" step="0.01" min="0" oninput="calcJoya()"></div>
+          <div class="fg"><label>Quilate *</label>
+            <select id="tj-quilate" onchange="calcJoya()">
+              <option value="0.417">10k</option>
+              <option value="0.583" selected>14k</option>
+              <option value="0.75">18k</option>
+              <option value="0.875">21k</option>
+              <option value="0.916">22k</option>
+              <option value="0.999">24k</option>
+            </select>
+          </div>
+          <div class="fg"><label>Precio del oro hoy ($/gramo) *</label><input type="number" id="tj-preciooro" step="0.01" min="0" oninput="calcJoya()"></div>
+          <div class="fg"><label>% a ofrecer sobre el valor *</label><input type="number" id="tj-porcentaje" step="1" min="0" max="100" value="70" oninput="calcJoya()"></div>
+        </div>
+        <div class="result-box">
+          <span class="result-label">Valor estimado a ofrecer</span>
+          <span class="result-value" id="tj-resultado">$0.00</span>
+        </div>
+        <button class="btn" onclick="generarTicket('joya')"><i class="fas fa-print"></i> Generar e imprimir comprobante</button>
+      </div>
+    </div>
+
+    <!-- TASADOR DE RELOJES -->
+    <div id="tasador-relojes-section" style="display: none;">
+      <div class="header"><h1>Tasador de Relojes</h1></div>
+      <div class="content-section">
+        <div class="form-grid">
+          <div class="fg"><label>Nombre del cliente *</label><input type="text" id="tr-nombre"></div>
+          <div class="fg"><label>Teléfono / WhatsApp *</label><input type="tel" id="tr-telefono"></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg"><label>Marca</label><input type="text" id="tr-marca" placeholder="Ej. Rolex"></div>
+          <div class="fg"><label>Modelo</label><input type="text" id="tr-modelo"></div>
+          <div class="fg"><label>Condición</label>
+            <select id="tr-condicion">
+              <option>Nuevo</option>
+              <option selected>Excelente</option>
+              <option>Bueno</option>
+              <option>Regular</option>
+              <option>Para reparar</option>
+            </select>
+          </div>
+          <div class="fg"><label>Incluye caja / papeles</label>
+            <select id="tr-accesorios">
+              <option>Caja y papeles</option>
+              <option>Solo caja</option>
+              <option>Solo papeles</option>
+              <option selected>Ninguno</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="fg span2"><label>Valor estimado a ofrecer ($) *</label><input type="number" id="tr-valor" step="0.01" min="0"></div>
+        </div>
+        <button class="btn" onclick="generarTicket('reloj')"><i class="fas fa-print"></i> Generar e imprimir comprobante</button>
+      </div>
+    </div>
+
+    <!-- COTIZADOR DE REFACCIÓN -->
+    <div id="cotizador-refaccion-section" style="display: none;">
+      <div class="header"><h1>Cotizador de Refacción</h1></div>
+      <div class="content-section">
+        <div class="form-grid">
+          <div class="fg"><label>Nombre del cliente *</label><input type="text" id="cr-nombre"></div>
+          <div class="fg"><label>Teléfono / WhatsApp *</label><input type="tel" id="cr-telefono"></div>
+        </div>
+        <div class="form-grid full">
+          <div class="fg"><label>Descripción del trabajo</label><textarea id="cr-desc" placeholder="Ej. Ajuste de talla, cambio de pila, soldadura..."></textarea></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg span2"><label>Precio cotizado ($) *</label><input type="number" id="cr-precio" step="0.01" min="0"></div>
+        </div>
+        <button class="btn" onclick="generarTicket('refaccion')"><i class="fas fa-print"></i> Generar e imprimir comprobante</button>
+      </div>
+    </div>
+
+    <!-- COTIZADOR DE FABRICACIÓN -->
+    <div id="cotizador-fabricacion-section" style="display: none;">
+      <div class="header"><h1>Cotizador de Fabricación</h1></div>
+      <div class="content-section">
+        <div class="form-grid">
+          <div class="fg"><label>Nombre del cliente *</label><input type="text" id="cf-nombre"></div>
+          <div class="fg"><label>Teléfono / WhatsApp *</label><input type="tel" id="cf-telefono"></div>
+        </div>
+        <div class="form-grid full">
+          <div class="fg"><label>Descripción de la pieza a fabricar</label><textarea id="cf-desc" placeholder="Ej. Anillo a la medida, oro 14k, diseño personalizado..."></textarea></div>
+        </div>
+        <div class="form-grid">
+          <div class="fg span2"><label>Precio cotizado ($) *</label><input type="number" id="cf-precio" step="0.01" min="0"></div>
+        </div>
+        <button class="btn" onclick="generarTicket('fabricacion')"><i class="fas fa-print"></i> Generar e imprimir comprobante</button>
       </div>
     </div>
   </div>
@@ -267,6 +409,195 @@
     document.getElementById(section + '-section').style.display = 'block';
     document.querySelectorAll('.sidebar-menu a').forEach(el => el.classList.remove('active'));
     event.target.closest('a').classList.add('active');
+    if (section === 'clientes') loadClientes();
+  }
+
+  /* ===== TASADOR DE JOYAS ===== */
+  function calcJoya() {
+    const peso = parseFloat(document.getElementById('tj-peso').value) || 0;
+    const pureza = parseFloat(document.getElementById('tj-quilate').value) || 0;
+    const precioOro = parseFloat(document.getElementById('tj-preciooro').value) || 0;
+    const pct = parseFloat(document.getElementById('tj-porcentaje').value) || 0;
+    const valor = peso * pureza * precioOro * (pct / 100);
+    document.getElementById('tj-resultado').textContent = '$' + valor.toFixed(2);
+  }
+
+  /* ===== CLIENTES (crear/actualizar por teléfono) ===== */
+  async function upsertCliente(nombre, telefono) {
+    const snap = await db.collection('clientes').where('telefono', '==', telefono).limit(1).get();
+    if (!snap.empty) {
+      const id = snap.docs[0].id;
+      await db.collection('clientes').doc(id).update({
+        nombre: nombre,
+        visitas: firebase.firestore.FieldValue.increment(1),
+        ultimaVisita: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return id;
+    } else {
+      const ref = await db.collection('clientes').add({
+        nombre: nombre,
+        telefono: telefono,
+        visitas: 1,
+        creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
+        ultimaVisita: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return ref.id;
+    }
+  }
+
+  async function loadClientes() {
+    try {
+      const snap = await db.collection('clientes').orderBy('ultimaVisita', 'desc').get();
+      let html = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const fecha = d.ultimaVisita && d.ultimaVisita.toDate ? d.ultimaVisita.toDate().toLocaleDateString('es-PA') : '—';
+        html += `<tr><td>${esc(d.nombre)}</td><td>${esc(d.telefono)}</td><td>${d.visitas || 1}</td><td>${fecha}</td></tr>`;
+      });
+      document.getElementById('clientes-table').innerHTML = html || '<tr><td colspan="4" class="loading">Sin clientes aún</td></tr>';
+    } catch (e) {
+      console.error('Error loading clientes:', e);
+    }
+  }
+
+  /* ===== GENERAR TICKET (guarda + imprime) ===== */
+  const TICKET_TITLES = {
+    joya: 'Tasación de Joya',
+    reloj: 'Tasación de Reloj',
+    refaccion: 'Cotización de Refacción',
+    fabricacion: 'Cotización de Fabricación'
+  };
+
+  async function generarTicket(tipo) {
+    let nombre, telefono, items, totalLabel, totalValor;
+
+    if (tipo === 'joya') {
+      nombre = document.getElementById('tj-nombre').value.trim();
+      telefono = document.getElementById('tj-telefono').value.trim();
+      const desc = document.getElementById('tj-desc').value.trim();
+      const peso = document.getElementById('tj-peso').value;
+      const quilateSel = document.getElementById('tj-quilate');
+      const quilateTxt = quilateSel.options[quilateSel.selectedIndex].text;
+      const precioOro = document.getElementById('tj-preciooro').value;
+      const pct = document.getElementById('tj-porcentaje').value;
+      totalValor = document.getElementById('tj-resultado').textContent;
+      if (!nombre || !telefono || !peso || !precioOro) { alert('Completa los campos obligatorios (*).'); return; }
+      items = [
+        ['Descripción', desc || '—'],
+        ['Peso', peso + ' g'],
+        ['Quilate', quilateTxt],
+        ['Precio del oro', '$' + parseFloat(precioOro).toFixed(2) + ' / g'],
+        ['% ofrecido', pct + '%']
+      ];
+      totalLabel = 'Valor estimado a ofrecer';
+    } else if (tipo === 'reloj') {
+      nombre = document.getElementById('tr-nombre').value.trim();
+      telefono = document.getElementById('tr-telefono').value.trim();
+      const marca = document.getElementById('tr-marca').value.trim();
+      const modelo = document.getElementById('tr-modelo').value.trim();
+      const condicion = document.getElementById('tr-condicion').value;
+      const accesorios = document.getElementById('tr-accesorios').value;
+      const valor = document.getElementById('tr-valor').value;
+      if (!nombre || !telefono || !valor) { alert('Completa los campos obligatorios (*).'); return; }
+      totalValor = '$' + parseFloat(valor).toFixed(2);
+      items = [
+        ['Marca', marca || '—'],
+        ['Modelo', modelo || '—'],
+        ['Condición', condicion],
+        ['Accesorios', accesorios]
+      ];
+      totalLabel = 'Valor estimado a ofrecer';
+    } else if (tipo === 'refaccion') {
+      nombre = document.getElementById('cr-nombre').value.trim();
+      telefono = document.getElementById('cr-telefono').value.trim();
+      const desc = document.getElementById('cr-desc').value.trim();
+      const precio = document.getElementById('cr-precio').value;
+      if (!nombre || !telefono || !precio) { alert('Completa los campos obligatorios (*).'); return; }
+      totalValor = '$' + parseFloat(precio).toFixed(2);
+      items = [['Descripción del trabajo', desc || '—']];
+      totalLabel = 'Precio cotizado';
+    } else if (tipo === 'fabricacion') {
+      nombre = document.getElementById('cf-nombre').value.trim();
+      telefono = document.getElementById('cf-telefono').value.trim();
+      const desc = document.getElementById('cf-desc').value.trim();
+      const precio = document.getElementById('cf-precio').value;
+      if (!nombre || !telefono || !precio) { alert('Completa los campos obligatorios (*).'); return; }
+      totalValor = '$' + parseFloat(precio).toFixed(2);
+      items = [['Descripción de la pieza', desc || '—']];
+      totalLabel = 'Precio cotizado';
+    }
+
+    try {
+      await upsertCliente(nombre, telefono);
+      await db.collection('tasaciones').add({
+        tipo: tipo,
+        clienteNombre: nombre,
+        clienteTelefono: telefono,
+        items: items,
+        totalLabel: totalLabel,
+        totalValor: totalValor,
+        staff: currentUser ? currentUser.email : '',
+        creadoEn: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (e) {
+      console.error('Error guardando tasación:', e);
+    }
+
+    imprimirComprobante({
+      titulo: TICKET_TITLES[tipo],
+      nombre, telefono, items, totalLabel, totalValor
+    });
+  }
+
+  function imprimirComprobante(t) {
+    const fecha = new Date().toLocaleString('es-PA', { dateStyle: 'long', timeStyle: 'short' });
+    const filasItems = t.items.map(([k, v]) => `<tr><td class="k">${esc(k)}</td><td class="v">${esc(v)}</td></tr>`).join('');
+    const win = window.open('', '_blank', 'width=700,height=900');
+    win.document.write(`
+      <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+      <title>${esc(t.titulo)} · Dinero Ya</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; color:#0E1B2C; padding:40px; }
+        .hd { display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #B08D57; padding-bottom:20px; margin-bottom:24px; }
+        .hd img { height:70px; }
+        .hd .meta { text-align:right; font-size:12px; color:#555; }
+        h1 { font-size:20px; margin-bottom:4px; }
+        .sub { color:#777; font-size:12px; margin-bottom:24px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+        td { padding:10px 8px; border-bottom:1px solid #eee; font-size:13px; }
+        td.k { color:#777; width:40%; }
+        td.v { font-weight:600; }
+        .total { display:flex; justify-content:space-between; align-items:center; background:#0E1B2C; color:#fff; padding:18px 20px; margin-bottom:30px; }
+        .total .l { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:#D9BE8E; }
+        .total .v { font-size:26px; font-weight:700; color:#F4B93C; }
+        .sig { display:flex; justify-content:space-between; margin-top:60px; }
+        .sig div { width:45%; border-top:1px solid #999; text-align:center; padding-top:8px; font-size:12px; color:#555; }
+        .foot { margin-top:40px; font-size:10px; color:#999; text-align:center; }
+        @media print { body { padding:20px; } }
+      </style></head><body>
+        <div class="hd">
+          <img src="${window.location.origin}/img/logo.png" alt="Dinero Ya">
+          <div class="meta">Av. Central, Plaza 5 de Mayo<br>Santa Ana, Panamá<br>+507 6336-5568</div>
+        </div>
+        <h1>${esc(t.titulo)}</h1>
+        <div class="sub">${fecha}</div>
+        <table>
+          <tr><td class="k">Cliente</td><td class="v">${esc(t.nombre)}</td></tr>
+          <tr><td class="k">Teléfono</td><td class="v">${esc(t.telefono)}</td></tr>
+          ${filasItems}
+        </table>
+        <div class="total"><span class="l">${esc(t.totalLabel)}</span><span class="v">${esc(t.totalValor)}</span></div>
+        <div class="sig">
+          <div>Firma del cliente</div>
+          <div>Firma del tasador</div>
+        </div>
+        <div class="foot">Este documento es una cotización/tasación estimada y no constituye un contrato hasta ser firmado por ambas partes. Dinero Ya · Casa de Empeño y Joyería.</div>
+      </body></html>
+    `);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
   }
 
   function logout() {
