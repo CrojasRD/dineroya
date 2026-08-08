@@ -123,6 +123,26 @@
     .client-badge { font-size: 0.78rem; color: var(--t2); margin-bottom: 4px; }
     .client-badge strong { color: var(--t1); }
 
+    /* ===== CHART: tasaciones por tipo ===== */
+    .viz-root {
+      --chart-series-1: #3987e5; /* joya   - blue */
+      --chart-series-2: #d95926; /* reloj  - orange */
+      --chart-series-3: #199e70; /* refaccion - aqua */
+      --chart-series-4: #c98500; /* fabricacion - yellow */
+      --chart-text-secondary: #9aa7ba;
+      --chart-text-muted: #7c879a;
+      --chart-baseline: #383835;
+      --chart-surface-gap: #0E1B2C;
+    }
+    .bar-chart { display: flex; align-items: flex-end; gap: 28px; height: 200px; padding: 10px 6px 0; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+    .bar-value { font-size: 0.85rem; font-weight: 600; color: var(--t1); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+    .bar-shape { width: 100%; max-width: 56px; border-radius: 4px 4px 0 0; transition: opacity .15s; }
+    .bar-shape:hover { opacity: 0.85; }
+    .bar-label { margin-top: 10px; font-size: 0.74rem; color: var(--chart-text-secondary); text-align: center; }
+    .bar-baseline { border-top: 1px solid var(--chart-baseline); margin-top: 0; }
+    .chart-empty { text-align: center; padding: 30px; color: var(--chart-text-muted); font-size: 0.85rem; }
+
     @media (max-width: 1040px) {
       .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--b); }
       .main { margin-left: 0; padding: 20px; }
@@ -170,6 +190,12 @@
         <div class="stat-card"><div class="stat-label">Citas totales</div><div class="stat-value" id="stat-citas">0</div></div>
         <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-value" id="stat-pendientes">0</div></div>
         <div class="stat-card"><div class="stat-label">Atendidas</div><div class="stat-value" id="stat-atendidas">0</div></div>
+        <div class="stat-card"><div class="stat-label">Tasaciones / cotizaciones</div><div class="stat-value" id="stat-tasaciones">0</div></div>
+      </div>
+
+      <div class="content-section viz-root">
+        <div class="section-title"><i class="fas fa-chart-column"></i> Tasaciones y cotizaciones por tipo</div>
+        <div id="tasaciones-chart"><p class="loading">Cargando datos...</p></div>
       </div>
 
       <div class="content-section">
@@ -235,13 +261,14 @@
               <option value="0.999">24k</option>
             </select>
           </div>
-          <div class="fg"><label>Precio del oro hoy ($/gramo) *</label><input type="number" id="tj-preciooro" step="0.01" min="0" oninput="calcJoya()"></div>
+          <div class="fg"><label>Precio del oro puro 24k hoy ($/gramo) *</label><input type="number" id="tj-preciooro" step="0.01" min="0" oninput="calcJoya()" placeholder="Ej. 140.00"></div>
           <div class="fg"><label>% a ofrecer sobre el valor *</label><input type="number" id="tj-porcentaje" step="1" min="0" max="100" value="70" oninput="calcJoya()"></div>
         </div>
         <div class="result-box">
           <span class="result-label">Valor estimado a ofrecer</span>
           <span class="result-value" id="tj-resultado">$0.00</span>
         </div>
+        <p style="font-size:.76rem;color:var(--t2);margin:-8px 0 20px">Fórmula: Peso × Pureza del quilate × Precio oro 24k/g × % ofrecido.</p>
         <button class="btn" onclick="generarTicket('joya')"><i class="fas fa-print"></i> Generar e imprimir comprobante</button>
       </div>
     </div>
@@ -349,6 +376,7 @@
     document.getElementById('userNameDisplay').textContent = user.email;
     document.getElementById('userEmailDisplay').textContent = user.email;
     loadDashboardData();
+    loadTasacionesChart();
   });
 
   function esc(s) { return (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -410,6 +438,51 @@
     document.querySelectorAll('.sidebar-menu a').forEach(el => el.classList.remove('active'));
     event.target.closest('a').classList.add('active');
     if (section === 'clientes') loadClientes();
+  }
+
+  /* ===== GRÁFICO: TASACIONES POR TIPO ===== */
+  const TIPO_META = {
+    joya: { label: 'Joyas', color: 'var(--chart-series-1)' },
+    reloj: { label: 'Relojes', color: 'var(--chart-series-2)' },
+    refaccion: { label: 'Refacción', color: 'var(--chart-series-3)' },
+    fabricacion: { label: 'Fabricación', color: 'var(--chart-series-4)' }
+  };
+
+  async function loadTasacionesChart() {
+    const wrap = document.getElementById('tasaciones-chart');
+    try {
+      const snap = await db.collection('tasaciones').get();
+      const counts = { joya: 0, reloj: 0, refaccion: 0, fabricacion: 0 };
+      snap.forEach(doc => {
+        const tipo = doc.data().tipo;
+        if (counts.hasOwnProperty(tipo)) counts[tipo]++;
+      });
+      document.getElementById('stat-tasaciones').textContent = snap.size;
+
+      if (snap.size === 0) {
+        wrap.innerHTML = '<p class="chart-empty">Aún no hay tasaciones ni cotizaciones registradas.</p>';
+        return;
+      }
+
+      const max = Math.max(1, ...Object.values(counts));
+      let html = '<div class="bar-chart">';
+      Object.keys(TIPO_META).forEach(key => {
+        const meta = TIPO_META[key];
+        const val = counts[key];
+        const heightPct = Math.max(4, (val / max) * 100);
+        html += `
+          <div class="bar-col">
+            <span class="bar-value">${val}</span>
+            <div class="bar-shape" style="height:${heightPct}%;background:${meta.color}" title="${meta.label}: ${val}"></div>
+            <span class="bar-label">${meta.label}</span>
+          </div>`;
+      });
+      html += '</div><div class="bar-baseline"></div>';
+      wrap.innerHTML = html;
+    } catch (e) {
+      console.error('Error loading tasaciones chart:', e);
+      wrap.innerHTML = '<p class="chart-empty">No se pudo cargar el gráfico.</p>';
+    }
   }
 
   /* ===== TASADOR DE JOYAS ===== */
@@ -539,6 +612,7 @@
         staff: currentUser ? currentUser.email : '',
         creadoEn: firebase.firestore.FieldValue.serverTimestamp()
       });
+      loadTasacionesChart();
     } catch (e) {
       console.error('Error guardando tasación:', e);
     }
@@ -558,10 +632,11 @@
       <title>${esc(t.titulo)} · Dinero Ya</title>
       <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: Arial, Helvetica, sans-serif; color:#0E1B2C; padding:40px; }
-        .hd { display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #B08D57; padding-bottom:20px; margin-bottom:24px; }
-        .hd img { height:70px; }
-        .hd .meta { text-align:right; font-size:12px; color:#555; }
+        body { font-family: Arial, Helvetica, sans-serif; color:#0E1B2C; }
+        .hd { display:flex; align-items:center; justify-content:space-between; background:#0E1B2C; border-bottom:3px solid #B08D57; padding:22px 40px; }
+        .hd img { height:64px; }
+        .hd .meta { text-align:right; font-size:12px; color:#FAF7F1; line-height:1.6; }
+        .body-pad { padding:32px 40px 40px; }
         h1 { font-size:20px; margin-bottom:4px; }
         .sub { color:#777; font-size:12px; margin-bottom:24px; }
         table { width:100%; border-collapse:collapse; margin-bottom:24px; }
@@ -574,25 +649,27 @@
         .sig { display:flex; justify-content:space-between; margin-top:60px; }
         .sig div { width:45%; border-top:1px solid #999; text-align:center; padding-top:8px; font-size:12px; color:#555; }
         .foot { margin-top:40px; font-size:10px; color:#999; text-align:center; }
-        @media print { body { padding:20px; } }
+        @media print { .body-pad { padding:24px 20px 20px; } }
       </style></head><body>
         <div class="hd">
           <img src="${window.location.origin}/img/logo.png" alt="Dinero Ya">
           <div class="meta">Av. Central, Plaza 5 de Mayo<br>Santa Ana, Panamá<br>+507 6336-5568</div>
         </div>
-        <h1>${esc(t.titulo)}</h1>
-        <div class="sub">${fecha}</div>
-        <table>
-          <tr><td class="k">Cliente</td><td class="v">${esc(t.nombre)}</td></tr>
-          <tr><td class="k">Teléfono</td><td class="v">${esc(t.telefono)}</td></tr>
-          ${filasItems}
-        </table>
-        <div class="total"><span class="l">${esc(t.totalLabel)}</span><span class="v">${esc(t.totalValor)}</span></div>
-        <div class="sig">
-          <div>Firma del cliente</div>
-          <div>Firma del tasador</div>
+        <div class="body-pad">
+          <h1>${esc(t.titulo)}</h1>
+          <div class="sub">${fecha}</div>
+          <table>
+            <tr><td class="k">Cliente</td><td class="v">${esc(t.nombre)}</td></tr>
+            <tr><td class="k">Teléfono</td><td class="v">${esc(t.telefono)}</td></tr>
+            ${filasItems}
+          </table>
+          <div class="total"><span class="l">${esc(t.totalLabel)}</span><span class="v">${esc(t.totalValor)}</span></div>
+          <div class="sig">
+            <div>Firma del cliente</div>
+            <div>Firma del tasador</div>
+          </div>
+          <div class="foot">Este documento es una cotización/tasación estimada y no constituye un contrato hasta ser firmado por ambas partes. Dinero Ya · Casa de Empeño y Joyería.</div>
         </div>
-        <div class="foot">Este documento es una cotización/tasación estimada y no constituye un contrato hasta ser firmado por ambas partes. Dinero Ya · Casa de Empeño y Joyería.</div>
       </body></html>
     `);
     win.document.close();
