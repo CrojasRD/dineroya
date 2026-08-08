@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Formulario público de "Separar Cita" en index.html
+    match /citas/{docId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Clientes y tasaciones/cotizaciones: 100% interno, solo staff logueado
+    match /clientes/{docId} {
+      allow read, write: if request.auth != null;
+    }
+    match /tasaciones/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Calificaciones del widget publico /calificar: creacion publica pero
+    // validada e inmutable; lectura solo para staff (panel /app).
+    match /calificaciones/{docId} {
+      allow read: if request.auth != null;
+      allow create: if
+        request.resource.data.keys().hasOnly(['calificacion', 'timestamp']) &&
+        request.resource.data.calificacion in ['malo', 'regular', 'bueno', 'excelente'] &&
+        request.resource.data.timestamp == request.time;
+      allow update, delete: if false;
+    }
+
+    // Configuracion del widget de calificacion (link de reseña de Google,
+    // URL de retencion). Lectura publica (el widget la necesita sin login),
+    // escritura solo staff logueado desde /app.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

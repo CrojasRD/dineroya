@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Califícanos · Dinero Ya</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/img/favicon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0E1B2C;
+      color: #FAF7F1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .box {
+      background: #14253c;
+      border: 1px solid rgba(176, 141, 87, 0.3);
+      border-radius: 2px;
+      padding: 50px 40px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 60px -20px rgba(0,0,0,.55);
+      text-align: center;
+    }
+    .logo-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+    }
+    .logo-s {
+      display: block;
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #D9BE8E;
+      margin-top: 4px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: #9aa7ba;
+      margin-bottom: 34px;
+    }
+    .opciones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .opcion {
+      padding: 22px 10px;
+      border: 1px solid rgba(176, 141, 87, 0.3);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #0E1B2C;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .opcion:hover { border-color: #B08D57; background: rgba(176, 141, 87, 0.08); }
+    .opcion.selected { border-color: #B08D57; background: rgba(176, 141, 87, 0.15); }
+    .opcion-icon { font-size: 34px; }
+    .opcion-texto { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em; color: #FAF7F1; }
+
+    .loading { display: none; justify-content: center; align-items: center; gap: 8px; margin-top: 24px; }
+    .loading.active { display: flex; }
+    .spinner { width: 7px; height: 7px; background: #B08D57; border-radius: 50%; animation: spin 1s infinite; }
+    .spinner:nth-child(2) { animation-delay: 0.2s; }
+    .spinner:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes spin { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    .mensaje { display: none; padding: 16px; border-radius: 2px; margin-top: 24px; font-size: 0.85rem; }
+    .mensaje.success { background: rgba(76, 175, 80, 0.15); color: #81c995; border: 1px solid rgba(76, 175, 80, 0.3); display: block; }
+    .mensaje.error { background: rgba(244, 67, 54, 0.15); color: #f28b82; border: 1px solid rgba(244, 67, 54, 0.3); display: block; }
+    .redirect-contador { color: #D9BE8E; font-size: 0.78rem; margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <div class="logo-n">Dinero Ya</div>
+  <span class="logo-s">Joyería · Panamá</span>
+
+  <h1 id="titulo">¿Cómo fue tu experiencia?</h1>
+  <p class="subtitle" id="subtitulo">Tu opinión es muy importante para nosotros</p>
+
+  <div class="opciones" id="opciones">
+    <div class="opcion" data-calificacion="malo">
+      <div class="opcion-icon">😞</div>
+      <div class="opcion-texto">Malo</div>
+    </div>
+    <div class="opcion" data-calificacion="regular">
+      <div class="opcion-icon">😐</div>
+      <div class="opcion-texto">Regular</div>
+    </div>
+    <div class="opcion" data-calificacion="bueno">
+      <div class="opcion-icon">😊</div>
+      <div class="opcion-texto">Bueno</div>
+    </div>
+    <div class="opcion" data-calificacion="excelente">
+      <div class="opcion-icon">🥰</div>
+      <div class="opcion-texto">Excelente</div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="spinner"></div>
+    <div class="spinner"></div>
+  </div>
+
+  <div class="mensaje" id="mensaje"></div>
+  <div class="redirect-contador" id="redirectContador"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWpjPPlgMlZ9O8NvgZ-klw4hCcLYpqMR4",
+    authDomain: "dineroya-706f2.firebaseapp.com",
+    projectId: "dineroya-706f2",
+    storageBucket: "dineroya-706f2.firebasestorage.app",
+    messagingSenderId: "183298279705",
+    appId: "1:183298279705:web:3205d60dcc40087f62dd88"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const RETENCION_URL_DEFAULT = 'https://dineroyajoyeria.com/';
+
+  const opcionesEl = document.getElementById('opciones');
+  const loadingEl = document.getElementById('loading');
+  const mensajeEl = document.getElementById('mensaje');
+  const contadorEl = document.getElementById('redirectContador');
+  const tituloEl = document.getElementById('titulo');
+  const subtituloEl = document.getElementById('subtitulo');
+
+  let config = { googleBusinessUrl: '', retencionUrl: RETENCION_URL_DEFAULT, activo: true };
+  let enviando = false;
+
+  async function init() {
+    try {
+      const snap = await db.collection('config').doc('calificador').get();
+      if (snap.exists) {
+        config = { ...config, ...snap.data() };
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (config.activo === false) {
+      tituloEl.textContent = 'Calificaciones no disponibles';
+      subtituloEl.textContent = 'Vuelve a intentarlo más tarde.';
+      opcionesEl.style.display = 'none';
+      return;
+    }
+
+    document.querySelectorAll('.opcion').forEach((opcion) => {
+      opcion.addEventListener('click', () => onSelect(opcion));
+    });
+  }
+
+  async function onSelect(opcion) {
+    if (enviando) return;
+    enviando = true;
+
+    document.querySelectorAll('.opcion').forEach((o) => o.classList.remove('selected'));
+    opcion.classList.add('selected');
+    const calificacion = opcion.dataset.calificacion;
+
+    loadingEl.classList.add('active');
+
+    try {
+      await db.collection('calificaciones').add({
+        calificacion,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      procesarCalificacion(calificacion);
+    } catch (err) {
+      console.error(err);
+      loadingEl.classList.remove('active');
+      mensajeEl.textContent = 'No se pudo enviar tu calificación. Intenta de nuevo.';
+      mensajeEl.className = 'mensaje error';
+      enviando = false;
+    }
+  }
+
+  function procesarCalificacion(calificacion) {
+    loadingEl.classList.remove('active');
+    opcionesEl.style.display = 'none';
+
+    if (['bueno', 'excelente'].includes(calificacion)) {
+      const destino = config.googleBusinessUrl || RETENCION_URL_DEFAULT;
+      redirigir(destino, '¡Gracias! Te llevamos a Google para dejar tu reseña...', 1);
+    } else {
+      const destino = config.retencionUrl || RETENCION_URL_DEFAULT;
+      redirigir(destino, 'Gracias por tu calificación. Tu opinión nos ayuda a mejorar.', 2);
+    }
+  }
+
+  function redirigir(url, texto, segundosIniciales) {
+    mensajeEl.textContent = texto;
+    mensajeEl.className = 'mensaje success';
+
+    let segundos = segundosIniciales;
+    const intervalo = setInterval(() => {
+      contadorEl.textContent = `Redirigiendo en ${segundos} segundo${segundos !== 1 ? 's' : ''}...`;
+      segundos--;
+      if (segundos < 0) {
+        clearInterval(intervalo);
+        window.location.href = url;
+      }
+    }, 1000);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
